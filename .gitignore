@@ -13,3 +13,16 @@ measurements*.txt
 
 # DuckDB files
 *.ddb
+
+# dev
+.idea
+Cargo.*
+gleam.toml
+manifest.toml
+
+# outputs:
+*.txt
+build/
+naive
+src/
+target/
