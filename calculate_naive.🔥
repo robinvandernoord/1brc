@@ -1,0 +1,175 @@
+from collections import dict, Dict
+from collections.vector import InlinedFixedVector
+from math import math
+from algorithm.sort import swap
+from python import Python
+from builtin import io
+
+fn round(some: Float64, precision: Int8) -> Float64:
+    # var pow = 10 ** precision
+    var base: Float64 = 10
+    var pow = math.pow(base, precision)
+
+    return math.round(some * pow) / pow # possibly only works on precision 1 but yolo good enough for 1brc
+
+fn bsort(inout strlist: DynamicVector[String]):
+    var changed = False
+    var ptr1 = 0
+    var ptr2 = 1
+    var Bigger: Int = 1
+
+    while ptr2 < len(strlist):
+        if strcmp(strlist[ptr1], strlist[ptr2]) == Bigger:
+            swap(
+                strlist[ptr1], 
+                strlist[ptr2]
+            )
+            changed = True
+        
+        ptr1 += 1
+        ptr2 += 1 
+    
+    if changed:
+        # recurse
+        bsort(strlist)
+    
+    
+
+@value
+struct Measurement(CollectionElement):
+    var min: Float64
+    var max: Float64
+    var sum: Float64
+    var cnt: Float64
+
+    fn format(self, location: String) -> String:
+        return location + "=" + self.min + '/' + self.avg() + '/' + self.max
+
+    fn avg(self) -> Float64:
+        return round(self.sum / self.cnt, 1)
+
+fn strcmp(string1: String, string2: String) -> Int:
+    var bytes1 = string1.as_bytes()
+    var bytes2 = string2.as_bytes()
+
+    var rng = math.min(len(string1), len(string2))
+    for i in range(rng):
+        if bytes1[i] == bytes2[i]:
+            continue
+        elif bytes1[i] < bytes2[i]:
+            return 1
+        else:
+            return -1
+
+    # exactly the same
+    return 0
+
+
+fn process_results(results: Dict[String, Measurement]) raises:
+    # for key_value in results.items():
+    #     print(
+    #         key_value[].value.format(key_value[].key)
+    #     )
+    
+    # sort keys:
+    var keys = DynamicVector[String](capacity=len(results))
+    for key in results.keys():
+        keys.append(key[])
+    
+    bsort(keys)
+
+    io.print_no_newline("{")
+    for key in keys:
+        io.print_no_newline(results[key[]].format(key[]))
+        io.print_no_newline(", ")
+    
+    io.print_no_newline("\b\b} \n")
+
+fn process_file(inout f_in: FileHandle) raises:
+    # inout means owernship of 'f' will be returned after this function is done with it
+    var newline = ord('\n')
+    var semicolon = ord(';')
+    var period = ord('.')
+    var hyphen = ord('-')
+    
+    var cap = 1_000_000
+    var buffer = DynamicVector[Int8](capacity=cap)
+
+    var current_location: String
+    var negative: Bool = False
+    var found_semicolon: Bool = False
+    var measurement: Int64 = 0
+    var final_measurement: Float64 = 0.0
+
+    var row: Measurement
+
+    var location_buf = DynamicVector[Int8](capacity=25)
+
+    var results = Dict[String, Measurement]()
+
+    while True:
+        buffer.clear()
+        var read = f_in.read(cap)
+        buffer.extend(read.as_bytes())
+                
+        if len(read) == 0:
+            break
+
+        var char: Int8
+        for idx in range(len(buffer)):
+            char = buffer.data[idx]
+            
+            if char == newline:
+                # new line!
+
+                if negative:
+                    final_measurement = -(measurement.cast[DType.float64]() / 10.0)
+                else:
+                    final_measurement = measurement.cast[DType.float64]() / 10.0
+
+                current_location = String(location_buf)
+
+                if current_location not in results:
+                    row = results[current_location] = Measurement(0.0, 0.0, 0.0, 0)
+                else:
+                    row = results[current_location]
+                
+                if final_measurement < row.min:
+                    row.min = final_measurement
+                elif final_measurement > row.max:
+                    row.max = final_measurement
+                
+                row.sum += final_measurement
+                row.cnt += 1
+
+                results[current_location] = row
+
+                # clean up for next line:
+
+                negative = False
+                found_semicolon = False
+                measurement = 0.0
+                location_buf.clear()
+            elif char == semicolon: 
+                location_buf.push_back(char) # idk why but this seems needed (it's the previous character all of a sudden??)
+                found_semicolon = True
+            elif found_semicolon:
+                # parse float
+                if char == hyphen:
+                    negative = True
+                elif char == period:
+                    # -
+                    pass
+                else:
+                    measurement = (measurement * 10) + (char - 48).cast[DType.int64]()
+            else:
+                # parse string
+                location_buf.push_back(char)
+
+
+    process_results(results)
+
+
+fn main() raises:
+    with open('measurements.txt', 'r') as f:
+        process_file(f)
