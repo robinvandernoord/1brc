@@ -18,6 +18,7 @@ ln -s measurements_${setting}.txt measurements.txt
 exe=/tmp/$script.exe
 
 g++ -O3 -o $exe $script
-time $exe > $output
+# time $exe > $output
+/usr/bin/time -f "| $script | g++ -O3 | %E | %U | %S | %P | %M | |" $exe > $output
 
 cmp --silent answer_${setting}.txt $output || echo 'WRONG'

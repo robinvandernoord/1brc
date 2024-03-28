@@ -15,12 +15,8 @@ fi
 rm measurements.txt
 ln -s measurements_${setting}.txt measurements.txt
 
-exe=/tmp/$script.exe
-
-export MOJO_PYTHON_LIBRARY="/usr/lib/x86_64-linux-gnu/libpython3.11.so"
-mojo build -o $exe $script
-# time $exe > $output
-/usr/bin/time -f "| $script | mojo | %E | %U | %S | %P | %M | |" $exe > $output
+# time bun $script > $output
+/usr/bin/time -f "| $script | bun | %E | %U | %S | %P | %M | |" bun $script > $output
 
 
 cmp --silent answer_${setting}.txt $output || echo 'WRONG'

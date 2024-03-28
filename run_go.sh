@@ -18,6 +18,8 @@ ln -s measurements_${setting}.txt measurements.txt
 exe=/tmp/$script.exe
 
 go build -o $exe $script
-time $exe > $output
+chmod +x $script
+# time $exe > $output
+/usr/bin/time -f "| $script | go | %E | %U | %S | %P | %M | |" $exe > $output
 
 cmp --silent answer_${setting}.txt $output || echo 'WRONG'

@@ -15,6 +15,7 @@ fi
 rm measurements.txt
 ln -s measurements_${setting}.txt measurements.txt
 
-time python $script > $output
+/usr/bin/time -f "| $script | node | %E | %U | %S | %P | %M | |" node $script > $output
+# time node $script > $output
 
 cmp --silent answer_${setting}.txt $output || echo 'WRONG'

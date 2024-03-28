@@ -18,6 +18,8 @@ ln -s measurements_${setting}.txt measurements.txt
 exe=/tmp/$script.exe
 
 rustc -C opt-level=3 -o $exe $script
-time $exe > $output
+# time $exe > $output
+/usr/bin/time -f "| $script | rs -C opt-level=3 | %E | %U | %S | %P | %M | |" $exe > $output
+
 
 cmp --silent answer_${setting}.txt $output || echo 'WRONG'

@@ -19,6 +19,8 @@ measurements*.txt
 Cargo.*
 gleam.toml
 manifest.toml
+bun.lockb
+node_modules/
 
 # outputs:
 *.txt
@@ -26,3 +28,4 @@ build/
 naive
 src/
 target/
+a.out

@@ -1,4 +1,4 @@
-package main_ai
+package main
 
 import (
 	"bufio"

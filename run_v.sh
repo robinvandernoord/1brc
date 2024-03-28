@@ -17,7 +17,9 @@ ln -s measurements_${setting}.txt measurements.txt
 
 exe=/tmp/$script.exe
 
-v -prod -o $exe $script
-time $exe > $output
+v -prealloc -prod -o $exe $script
+# time $exe > $output
+/usr/bin/time -f "| $script | v -prod | %E | %U | %S | %P | %M | |" $exe > $output
+
 
 cmp --silent answer_${setting}.txt $output || echo 'WRONG'
