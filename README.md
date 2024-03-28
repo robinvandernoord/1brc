@@ -16,6 +16,7 @@
 | calculate_naive.py  | mojo              | 0:03.75 | 3.66  | 0.05 | 99%  | 18816    | ran fully via 'import_module'      |
 | calculate_naive.py  | python3.10        | 0:04.25 | 4.22  | 0.03 | 100% | 10624    |                                    |
 | naive-gc.bun.ts     | bun               | 0:04.35 | 4.27  | 1.25 | 127% | 74840    | `Bun.gc(true)` after each chunk    |
+| naive-char.bun.ts   | bun               | 0:05.64 | 5.60  | 0.17 | 102% | 111824   | Invalid character encoding         |
 | calculateAverage.py | python3.11        | 0:00.81 | 5.16  | 0.07 | 639% | 14592    |                                    |
 | naive.node.js       | node              | 0:05.29 | 5.31  | 5.30 | 200% | 81028    |                                    |
 | calculateAverage.py | python3.12        | 0:00.86 | 5.48  | 0.04 | 636% | 15616    |                                    |

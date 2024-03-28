@@ -85,6 +85,11 @@ fn process_results(results: Dict[String, Measurement]) raises:
     
     io.print_no_newline("\b\b} \n")
 
+fn parse_float(float_str: String) raises -> Float64:
+    # only supports floats in the format 13.3 (1 decimal)
+    return atol(float_str.replace(".", "")) / 10
+
+
 fn process_file(inout f_in: FileHandle) raises:
     # inout means owernship of 'f' will be returned after this function is done with it
     var newline = ord('\n')
@@ -92,8 +97,7 @@ fn process_file(inout f_in: FileHandle) raises:
     var period = ord('.')
     var hyphen = ord('-')
     
-    var cap = 1_000_000
-    var buffer = DynamicVector[Int8](capacity=cap)
+    var cap = 1_000_000_000
 
     var current_location: String
     var negative: Bool = False
@@ -103,69 +107,48 @@ fn process_file(inout f_in: FileHandle) raises:
 
     var row: Measurement
 
-    var location_buf = DynamicVector[Int8](capacity=25)
-
     var results = Dict[String, Measurement]()
 
+    var trailing: String = ""
+    var location: String
+    var splitted: DynamicVector[String]
+
     while True:
-        # buffer.clear()
-        buffer = f_in.read(cap).as_bytes()
-        # buffer.extend(read.as_bytes())
-                
-        if len(buffer) == 0:
+        var read = f_in.read(cap)
+        if len(read) == 0:
+            # done!
             break
 
-        var char: Int8
-        for idx in range(len(buffer)):
-            char = buffer.data[idx]
-            
-            if char == newline:
-                # new line!
+        var parts = read.split("\n")
 
-                if negative:
-                    final_measurement = -(measurement.cast[DType.float64]() / 10.0)
-                else:
-                    final_measurement = measurement.cast[DType.float64]() / 10.0
+        for idx in range(len(parts) - 1):
+            splitted = (trailing + parts[idx]).split(";")
+            # splitted.0 = location
+            # splitted.1 = value_as_str
 
-                current_location = String(location_buf)
-
-                if current_location not in results:
-                    row = results[current_location] = Measurement(0.0, 0.0, 0.0, 0)
-                else:
-                    row = results[current_location]
-                
-                if final_measurement < row.min:
-                    row.min = final_measurement
-                elif final_measurement > row.max:
-                    row.max = final_measurement
-                
-                row.sum += final_measurement
-                row.cnt += 1
-
-                results[current_location] = row
-
-                # clean up for next line:
-
-                negative = False
-                found_semicolon = False
-                measurement = 0.0
-                location_buf.clear()
-            elif char == semicolon: 
-                location_buf.push_back(char) # idk why but this seems needed (it's the previous character all of a sudden??)
-                found_semicolon = True
-            elif found_semicolon:
-                # parse float
-                if char == hyphen:
-                    negative = True
-                elif char == period:
-                    # -
-                    pass
-                else:
-                    measurement = (measurement * 10) + (char - 48).cast[DType.int64]()
+            if splitted[0] not in results:
+                row = results[splitted[0]] = Measurement(0.0, 0.0, 0.0, 0)
             else:
-                # parse string
-                location_buf.push_back(char)
+                row = results[splitted[0]]
+            
+            final_measurement = parse_float(splitted[1])
 
+            if final_measurement < row.min:
+                row.min = final_measurement
+            elif final_measurement > row.max:
+                row.max = final_measurement
+            
+            row.sum += final_measurement
+            row.cnt += 1
+
+            results[splitted[0]] = row
+
+            trailing = ''
+        
+        trailing = parts[len(parts) - 1]
+
+    if trailing:
+        raise Error("Trailing: " + trailing)
 
     process_results(results)
 
