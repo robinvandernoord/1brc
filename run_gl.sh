@@ -18,6 +18,7 @@ ln -s measurements_${setting}.txt measurements.txt
 # don't have much choice here since it's defined in gleam.toml ...
 exe='./naive'
 gleam run -m gleescript
+chmod +x $exe
 # time $exe > $output
 /usr/bin/time -f "| $script | gleam | %E | %U | %S | %P | %M | |" $exe > $output
 
