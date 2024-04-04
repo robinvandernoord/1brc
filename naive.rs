@@ -5,12 +5,7 @@ use std::io::{self, BufRead};
 
 fn read_file(filename: &str) -> io::Result<io::Lines<io::BufReader<File>>> {
     let file = File::open(filename)?;
-    return Ok(io::BufReader::new(file).lines())
-}
-
-fn split<'a, 'b>(value: &'a str, sep: &'b str) -> (&'a str, &'a str) {
-    let values: Vec<&str> = value.split(sep).collect();
-    return (values[0], values[1])
+    return Ok(io::BufReader::new(file).lines());
 }
 
 #[derive(Debug)]
@@ -41,7 +36,7 @@ impl Measurement {
 }
 
 fn as_float(value_as_str: &str) -> f64 {
-    return value_as_str.parse::<f64>().unwrap_or(0.0)
+    return value_as_str.parse::<f64>().unwrap_or(0.0);
 }
 
 fn print_results(readings: HashMap<String, Measurement>) {
@@ -55,37 +50,38 @@ fn print_results(readings: HashMap<String, Measurement>) {
     }
 
     print!("\x08\x08}} \n")
-
 }
 
-fn main () {
-    let reader = read_file("measurements.txt");
-    if !reader.is_ok() {
-        panic!("Unknown file.")
-    }
+fn main() {
+    match read_file("measurements.txt") {
+        Err(_) => panic!("Unknown file."),
+        Ok(file) => {
+            let mut readings: HashMap<String, Measurement> = HashMap::new();
 
-    let mut readings: HashMap<String, Measurement> = HashMap::new();
+            for line in file.flatten() {
+                let (location_as_str, value_as_str) = line.split_at(line.find(';').unwrap() + 1);
 
-    for line in reader.unwrap().flatten() {
-        let (location, value_as_str) = split(&line, ";");
-        let value_as_float = as_float(value_as_str);
+                let mut location = location_as_str.to_string();
+                location.remove(location.len() - 1); // drop ;
+                let value_as_float = as_float(value_as_str);
 
-        // let reading: &&Measurement = readings.get(location).unwrap_or_else(|| &new_measurement());
-        let reading = readings.entry(location.to_string()).or_insert_with(&Measurement::new);
+                // let reading: &&Measurement = readings.get(location).unwrap_or_else(|| &new_measurement());
+                let reading = readings.entry(location).or_insert_with(&Measurement::new);
 
-        if value_as_float > reading.max {
-            // reading.max.max(other)
-            reading.max = value_as_float
+                if value_as_float > reading.max {
+                    // reading.max.max(other)
+                    reading.max = value_as_float
+                }
+
+                if value_as_float < reading.min {
+                    reading.min = value_as_float
+                }
+
+                reading.sum += value_as_float;
+                reading.cnt += 1.0;
+            }
+
+            print_results(readings);
         }
-
-        if value_as_float < reading.min {
-            reading.min = value_as_float
-        }
-
-        reading.sum += value_as_float;
-        reading.cnt += 1.0;
     }
-
-    print_results(readings);
-
 }
