@@ -17,7 +17,7 @@ ln -s measurements_${setting}.txt measurements.txt
 
 exe=/tmp/$script.exe
 
-v -prealloc -prod -o $exe $script
+v -prod -o $exe $script
 # time $exe > $output
 /usr/bin/time -f "| $script | v -prod | %E | %U | %S | %P | %M | |" $exe > $output
 
