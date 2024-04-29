@@ -1,0 +1,63 @@
+from collections import defaultdict
+import math
+
+
+\tee = it => print(it) or it
+
+data Result(
+    \min: int = math.inf,
+    \max: int = -math.inf,
+    \sum: int = 0,
+    \cnt: int = 0,
+):
+    def update(self, value) = self._replace(
+            sum = self.sum + value, 
+            cnt = self.cnt + 1,
+            min = min(self.min, value),
+            max = max(self.max, value),
+            )
+    
+    def __str__(self) = f"{self.min:.1f}/{self.avg():.1f}/{self.max:.1f}"
+
+    def avg(self) = self.sum / self.cnt
+
+def parse(row: str) = (
+        row
+        |> .split(";")
+        |*> (loc, num) => (
+                loc, 
+                num |> .strip() |> float
+            )
+    )
+
+def update(dct, (key, value)) = dct where:
+        dct[key] = (
+            dct[key]
+            |> .update(value)
+            )
+
+def fmt((key, value)) = f"{key}={value},"
+
+def output(dct) = dct |> .items() |> map$(fmt) |> list |> " ".join |> print$(?, end="")
+
+
+def process(lines: TextIO):
+    (
+        iter(lines) 
+        # todo: mapreduce ?
+        |> map$(parse) 
+        |> reduce$(
+            update,
+            ?,
+            defaultdict(Result)
+        )
+        |> .items()
+        |> sorted
+        |> dict
+        |> output
+    )
+
+with open("measurements.txt") as f:
+    print("{", end="")
+    process(f)
+    print(" } ")

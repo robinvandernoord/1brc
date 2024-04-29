@@ -21,6 +21,8 @@ gleam.toml
 manifest.toml
 bun.lockb
 node_modules/
+__coconut_cache__/
+measurements.zip
 
 # outputs:
 *.txt

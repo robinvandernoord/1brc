@@ -1,44 +1,51 @@
 # Tiny (10M)
 
-| script                 | runtime           | wall    | user  | sys  | cpu  | mem (kb) | notes                              | 
-|------------------------|-------------------|---------|-------|------|------|----------|------------------------------------|
-| naive_ai_optimized.cpp | g++ -O3           | 0:00.70 | 0.69  | 0.00 | 99%  | 3840     |                                    |
-| naive.rs               | rs -C opt-level=3 | 0:00.98 | 0.95  | 0.02 | 99%  | 2048     |                                    |
-| naive.cpp              | g++ -O3           | 0:01.08 | 1.05  | 0.03 | 100% | 3840     |                                    |
-| naive.v                | v -prealloc -prod | 0:01.75 | 1.53  | 0.22 | 100% | 905088   | crashes on larger datasets         |
-| naive.v                | v -prod           | 0:01.67 | 1.64  | 0.02 | 100% | 2560     |                                    |
-| naive.go               | go                | 0:01.72 | 1.69  | 0.05 | 101% | 7228     |                                    |
-| naive.cpp              | g++ -O3           | 0:01.90 | 1.90  | 0.00 | 99%  | 3712     |                                    |
-| naive.v                | v -gc none -prod  | 0:02.47 | 2.06  | 0.40 | 99%  | 2049536  |                                    |
-| naive.v                | v -autofree -prod | 0:02.94 | 2.66  | 0.27 | 99%  | 1253760  |                                    |
-| naive_ai.go            | go                | 0:02.25 | 2.78  | 0.24 | 134% | 689324   | loads the entire file into memory  |
-| naive.bun.ts           | bun               | 0:02.89 | 2.93  | 0.13 | 106% | 145704   |                                    |
-| calculate_naive.py     | python3.11        | 0:03.43 | 3.38  | 0.03 | 99%  | 10616    |                                    |
-| calculate_naive.py     | python3.12        | 0:03.66 | 3.64  | 0.02 | 100% | 11648    |                                    |
-| calculate_naive.py     | mojo              | 0:03.75 | 3.66  | 0.05 | 99%  | 18816    | ran fully via 'import_module'      |
-| calculate_naive.py     | python3.10        | 0:04.25 | 4.22  | 0.03 | 100% | 10624    |                                    |
-| naive-gc.bun.ts        | bun               | 0:04.35 | 4.27  | 1.25 | 127% | 74840    | `Bun.gc(true)` after each chunk    |
-| naive-char.bun.ts      | bun               | 0:05.64 | 5.60  | 0.17 | 102% | 111824   | Invalid character encoding         |
-| calculateAverage.py    | python3.11        | 0:00.81 | 5.16  | 0.07 | 639% | 14592    |                                    |
-| naive.node.js          | node              | 0:05.29 | 5.31  | 5.30 | 200% | 81028    |                                    |
-| calculateAverage.py    | python3.12        | 0:00.86 | 5.48  | 0.04 | 636% | 15616    |                                    |
-| naive.rs               | rs                | 0:06.29 | 6.27  | 0.02 | 99%  | 2048     |                                    |
-| naive.cpp              | g++               | 0:06.88 | 6.87  | 0.01 | 100% | 3712     |                                    |
-| calculateAverage.py    | python3.10        | 0:01.12 | 6.94  | 0.04 | 621% | 14208    |                                    |
-| naive.v                | v -gc none        | 0:07.48 | 6.96  | 0.52 | 100% | 2050432  |                                    |
-| naive.v                | v -prealloc       | 0:07.20 | 6.97  | 0.23 | 100% | 907008   |                                    |
-| calculate_naive.🔥     | mojo              | 0:07.67 | 7.59  | 0.08 | 100% | 12908    | incorrect float precision and sort |
-| naive.v                | v -autofree       | 0:08.43 | 8.14  | 0.29 | 100% | 1254656  |                                    |
-| naive.v                | v                 | 0:07.79 | 8.57  | 0.86 | 121% | 4480     |                                    |
-| threaded.v             | v -gc none -prod  | 0:04.72 | 15.98 | 5.39 | 452% | 2363648  |                                    |
-| threaded.v             | v -autofree -prod | 0:04.61 | 16.99 | 4.47 | 465% | 1254784  |                                    |
-| threaded.v             | v -prod           | 0:07.56 | 23.91 | 6.67 | 404% | 7424     |                                    |
-| threaded.v             | v -gc none        | 0:07.70 | 35.94 | 4.42 | 523% | 2364544  |                                    |
-| threaded.v             | v -autofree       | 0:07.72 | 36.37 | 3.85 | 520% | 1255936  |                                    |
-| threaded.v             | v                 | 0:12.96 | 51.01 | 5.99 | 439% | 9472     |                                    |
-| naive.gleam            | gleam             | 1:10.46 | 70.61 | 0.72 | 101% | 63252    |                                    |
-| threaded.v             | v -prealloc       | 0:00.00 | 0.00  | 0.00 | 557% | 4736     | Crash                              |
-| threaded.v             | v -prealloc -prod | 0:00.00 | 0.00  | 0.00 | 24%  | 3456     | segmentation fault                 |
+| script                 | runtime                        | wall    | user  | sys  | cpu  | mem (kb) | notes                              | 
+|------------------------|--------------------------------|---------|-------|------|------|----------|------------------------------------|
+| naive_ai_optimized.cpp | g++ -O3                        | 0:00.70 | 0.69  | 0.00 | 99%  | 3840     |                                    |
+| naive.rs               | rs -C opt-level=3              | 0:00.98 | 0.95  | 0.02 | 99%  | 2048     |                                    |
+| naive.cpp              | g++ -O3                        | 0:01.08 | 1.05  | 0.03 | 100% | 3840     |                                    |
+| naive.v                | v -prealloc -prod              | 0:01.75 | 1.53  | 0.22 | 100% | 905088   | crashes on larger datasets         |
+| naive.v                | v -prod                        | 0:01.67 | 1.64  | 0.02 | 100% | 2560     |                                    |
+| naive.go               | go                             | 0:01.72 | 1.69  | 0.05 | 101% | 7228     |                                    |
+| naive.cpp              | g++ -O3                        | 0:01.90 | 1.90  | 0.00 | 99%  | 3712     |                                    |
+| naive.v                | v -gc none -prod               | 0:02.47 | 2.06  | 0.40 | 99%  | 2049536  |                                    |
+| naive.v                | v -autofree -prod              | 0:02.94 | 2.66  | 0.27 | 99%  | 1253760  |                                    |
+| naive_ai.go            | go                             | 0:02.25 | 2.78  | 0.24 | 134% | 689324   | loads the entire file into memory  |
+| naive.bun.ts           | bun                            | 0:02.89 | 2.93  | 0.13 | 106% | 145704   |                                    |
+| calculate_naive.py     | python3.11                     | 0:03.43 | 3.38  | 0.03 | 99%  | 10616    |                                    |
+| calculate_naive.py     | python3.12                     | 0:03.66 | 3.64  | 0.02 | 100% | 11648    |                                    |
+| calculate_naive.py     | mojo                           | 0:03.75 | 3.66  | 0.05 | 99%  | 18816    | ran fully via 'import_module'      |
+| calculate_naive.py     | python3.10                     | 0:04.25 | 4.22  | 0.03 | 100% | 10624    |                                    |
+| naive-gc.bun.ts        | bun                            | 0:04.35 | 4.27  | 1.25 | 127% | 74840    | `Bun.gc(true)` after each chunk    |
+| naive-char.bun.ts      | bun                            | 0:05.64 | 5.60  | 0.17 | 102% | 111824   | Invalid character encoding         |
+| calculateAverage.py    | python3.11                     | 0:00.81 | 5.16  | 0.07 | 639% | 14592    |                                    |
+| naive.node.js          | node                           | 0:05.29 | 5.31  | 5.30 | 200% | 81028    |                                    |
+| calculateAverage.py    | python3.12                     | 0:00.86 | 5.48  | 0.04 | 636% | 15616    |                                    |
+| naive.rs               | rs                             | 0:06.29 | 6.27  | 0.02 | 99%  | 2048     |                                    |
+| naive.cpp              | g++                            | 0:06.88 | 6.87  | 0.01 | 100% | 3712     |                                    |
+| calculateAverage.py    | python3.10                     | 0:01.12 | 6.94  | 0.04 | 621% | 14208    |                                    |
+| naive.v                | v -gc none                     | 0:07.48 | 6.96  | 0.52 | 100% | 2050432  |                                    |
+| naive.v                | v -prealloc                    | 0:07.20 | 6.97  | 0.23 | 100% | 907008   |                                    |
+| calculate_naive.🔥     | mojo                           | 0:07.67 | 7.59  | 0.08 | 100% | 12908    | incorrect float precision and sort |
+| naive.v                | v -autofree                    | 0:08.43 | 8.14  | 0.29 | 100% | 1254656  |                                    |
+| naive.v                | v                              | 0:07.79 | 8.57  | 0.86 | 121% | 4480     |                                    |
+| threaded.v             | v -gc none -prod               | 0:04.72 | 15.98 | 5.39 | 452% | 2363648  |                                    |
+| threaded.v             | v -autofree -prod              | 0:04.61 | 16.99 | 4.47 | 465% | 1254784  |                                    |
+| naive.coco             | coconut --target 3.11 --no-tco | 0:21.78 | 21.78 | 0.00 | 99%  | 26692    |                                    |
+| threaded.v             | v -prod                        | 0:07.56 | 23.91 | 6.67 | 404% | 7424     |                                    |
+| naive.coco             | coconut --target 3.12 --no-tco | 0:24.45 | 24.42 | 0.02 | 100% | 31860    |                                    |
+| naive.coco             | coconut --target 3.10 --no-tco | 0:29.61 | 29.68 | 0.78 | 102% | 42800    |                                    |
+| threaded.v             | v -gc none                     | 0:07.70 | 35.94 | 4.42 | 523% | 2364544  |                                    |
+| threaded.v             | v -autofree                    | 0:07.72 | 36.37 | 3.85 | 520% | 1255936  |                                    |
+| naive.coco             | coconut --target 3.11          | 0:45.75 | 45.72 | 0.03 | 99%  | 26704    |                                    |
+| naive.coco             | coconut                        | 0:46.73 | 46.70 | 0.03 | 99%  | 28364    |                                    | via Python 3.11
+| naive.coco             | coconut --target 3.12          | 0:49.42 | 49.37 | 0.05 | 99%  | 32120    |                                    |
+| threaded.v             | v                              | 0:12.96 | 51.01 | 5.99 | 439% | 9472     |                                    |
+| naive.coco             | coconut --target 3.10          | 1:03.76 | 63.87 | 0.76 | 101% | 42932    |                                    |
+| naive.gleam            | gleam                          | 1:10.46 | 70.61 | 0.72 | 101% | 63252    |                                    |
+| threaded.v             | v -prealloc                    | 0:00.00 | 0.00  | 0.00 | 557% | 4736     | Crash                              |
+| threaded.v             | v -prealloc -prod              | 0:00.00 | 0.00  | 0.00 | 24%  | 3456     | segmentation fault                 |
 
 # Small (100M)
 
